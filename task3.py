@@ -24,10 +24,10 @@ def load_logs(file_path: str) -> list:
                 if log_data:
                     logs.append(log_data)
     except FileNotFoundError:
-        print("File not found.")
+        print("Файл не знайдено.")
         sys.exit(1)
     except Exception as e:
-        print(f"An error occurred: {e}")
+        print(f"Сталася помилка: {e}")
         sys.exit(1)
     return logs
 
@@ -43,16 +43,21 @@ def count_logs_by_level(logs: list) -> dict:
         log_counts[level] = log_counts.get(level, 0) + 1
     return log_counts
 
-def display_log_counts(counts: dict):
-    """Display the log counts in a formatted table."""
-    print("Log Level | Count")
-    print("-----------------")
-    for level, count in counts.items():
-        print(f"{level.upper():<10} | {count}")
+def display_log_counts(counts: dict, logs: list = None, level: str = None):
+    """Display the log counts in a formatted table and, if specified, the logs of a particular level."""
+    print("Рівень логування | Кількість")
+    print("-----------------|----------")
+    for level_key, count in sorted(counts.items()):
+        print(f"{level_key.upper():<15} | {count}")
+    
+    if logs is not None and level is not None:
+        print(f"\nДеталі логів для рівня '{level.upper()}':")
+        for log in logs:
+            print(f"{log['timestamp']} - {log['message']}")
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
-        print("Usage: python main.py <log_file_path> [log_level]")
+        print("Використання: python main.py <шлях_до_файлу_логів> [рівень_логування]")
         sys.exit(1)
 
     log_file_path = sys.argv[1]
@@ -61,11 +66,13 @@ if __name__ == "__main__":
         log_level = sys.argv[2]
 
     logs = load_logs(log_file_path)
+    log_counts = count_logs_by_level(logs)
+    
     if log_level:
         filtered_logs = filter_logs_by_level(logs, log_level)
-        display_log_counts(count_logs_by_level(filtered_logs))
-        print(f"\nDetails of logs for level '{log_level.upper()}':")
-        for log in filtered_logs:
-            print(f"{log['timestamp']} - {log['message']}")
+        display_log_counts(log_counts, filtered_logs, log_level)
     else:
-        display_log_counts(count_logs_by_level(logs))
+        display_log_counts(log_counts)
+
+
+

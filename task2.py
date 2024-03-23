@@ -3,7 +3,7 @@ from typing import Callable
 
 def generator_numbers(text: str):
     # Шукаємо всі дійсні числа у тексті за допомогою регулярного виразу
-    pattern = r'\b\d+\.\d+\b'  # Шаблон для дійсного числа
+    pattern = r'(?<=\s)\d+\.\d+(?=\s)'  # Шаблон для дійсного числа
     for match in re.finditer(pattern, text):
         yield float(match.group())  # Повертаємо знайдене дійсне число як float
 
